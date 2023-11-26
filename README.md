@@ -1,149 +1,62 @@
-## JaxRS + openAPI
+##### M2 IL. TAA TP Des Servlets à la notion de service Web
+##### Shcherbakova Kateryna 
+##### Tkachenko Oleksii 
 
-1. Import this project in your IDE, 
-2. Start the database
-3. Start the database viewer
-4. Start the backend. There is a main class to start the backend
+# Partie 1: Servlet "https://github.com/kate-shcherbakova/taa_tp1/tree/servlet"
 
+Cette partie du projet est consacrée à l'utilisation des servlets pour le traitement des requêtes HTTP, la mise en œuvre de la logique commerciale, la création de pages web dynamiques et l'interaction avec la base de données.
 
+## Structure du projet
+Le code de cette partie du projet se trouve sur la branche `servlet`. 
+Le projet peut être divisé en trois paquets principaux :
+- **dao**: Fournir des méthodes pour effectuer des opérations de base de données via JPA (Java Persistence API) telles que la recherche, l'enregistrement, la mise à jour et la suppression d'entités.
+- **business**: Ils sont utilisés pour décrire les données et les relations entre elles afin de les stocker dans une base de données à l'aide de JPA. Ils fournissent une structure pour travailler avec les données dans une application. Ils représentent la logique d'entreprise.
+- **servlet**: Ils traitent les requêtes des clients côté serveur. Ils sont responsables de la modification dynamique des pages et de l'interaction avec les bases de données.
 
+## Utilisation
+1. Assurez-vous d'avoir les dépendances nécessaires et Java installé.
+2. Importez le projet dans votre IDE.
+3. Exécutez le serveur `run-hsqldb-server.sh`, qui est nécessaire pour la base de données. (En cas de problème, utilisez un serveur avec TAA_TP1.`https://github.com/kate-shcherbakova/taa_tp1`.)
+4. Il est également souhaitable d'utiliser le fichier JpaTest du TP1 pour remplir la base de données avec des valeurs initiales.
+5. Clic droit sur votre projet. run as -> maven build …-> mettre compile jetty:run dans le goal.
+6. Lancez votre navigateur et tapez http://localhost:8080/myform.html dans la barre d'adresse.
 
-# Task Open API Integration 
+---
 
-Now, we would like to ensure that our API can be discovered. The OpenAPI Initiative (OAI) was created by a consortium of forward-looking industry experts who recognize the immense value of standardizing on how REST APIs are described. As an open governance structure under the Linux Foundation, the OAI is focused on creating, evolving and promoting a vendor neutral description format. 
+# Partie 2. JaxRS et OpenAPI "https://github.com/LexaProInvoke/TAA_TP2_JaxRS_OpenAPI"
 
-APIs form the connecting glue between modern applications. Nearly every application uses APIs to connect with corporate data sources, third party data services or other applications. Creating an open description format for API services that is vendor neutral, portable and open is critical to accelerating the vision of a truly connected world.
+Le projet est un service web, qui est basé sur l'architecture REST et donne la possibilité d'accéder à la base de données par de simples requêtes url.
 
-To do this integration first, I already add a dependencies to openAPI libraries. 
+## Structure du Projet
 
-```xml
-		<dependency>
-			<groupId>io.swagger.core.v3</groupId>
-			<artifactId>swagger-jaxrs2-jakarta</artifactId>
-			<version>2.2.15</version>
-		</dependency>
+Le projet est organisé en plusieurs packages :
 
-		<dependency>
-			<groupId>io.swagger.core.v3</groupId>
-			<artifactId>swagger-jaxrs2-servlet-initializer-v2</artifactId>
-			<version>2.2.15</version>
-		</dependency>
-```
+- `dao.generic`: Contient des classes et des interfaces permettant d'interagir avec la base de données.
+- `domain`: Contient des descriptions des modèles commerciaux de base de l'application.
+- `rest`: contient des fichiers qui traitent les demandes via l'API REST, y compris des classes de ressources avec des méthodes pour traiter les demandes HTTP (GET, POST, PUT, DELETE), des annotations pour la gestion des demandes et la logique de traitement des demandes.
 
-Next you have to add OpenAPI Resource to your application
+## Fonctionnalités Principales
 
-Your application could be something like that. 
+- **Client** Envoie des requêtes à la base de données pour interagir avec les données relatives aux conférences et aux membres.
+- **Server**: Contrôler les demandes "Rest" entrantes et renvoyer la réponse et les données appropriées. Peut accéder à la base de données pour récupérer et enregistrer des informations.
+- **Base de données** Contient des informations sur tous les rendez-vous et les utilisateurs.
 
-```java
-@ApplicationPath("/")
-public class RestApplication extends Application {
+## Utilisation
 
-	@Override
-	public Set<Class<?>> getClasses() {
-		final Set<Class<?>> resources = new HashSet<>();
+Pour exécuter l'application :
+1. Assurez-vous d'avoir les dépendances nécessaires et Java installé.
+2. Importez le projet dans votre IDE.
+3. Exécutez le serveur `run-hsqldb-server.sh`, qui est nécessaire pour la base de données. (En cas de problème, utilisez un serveur avec TAA_TP1.`https://github.com/kate-shcherbakova/taa_tp1`.)
+4. Il est également souhaitable d'utiliser le fichier JpaTest du TP1 pour remplir la base de données avec des valeurs initiales.
+5. Démarrer `RestServer`, il surveillera les commandes des utilisateurs et les enverra pour exécution.
+6. Ouvrez le navigateur et dans la ligne d'adresse tapez `http://localhost:8080/api/` cela lancera notre api ainsi qu'un swager qui simplifiera l'utilisation des commandes.
+7. Envoyez les commandes dont vous avez besoin pour travailler avec la base de données.
 
+## Rest API
 
-		// SWAGGER endpoints
-		resources.add(OpenApiResource.class);
+Dans ce projet, l'utilisation de la technologie Rest a été le point clé, car elle a permis d'échanger des données entre le client et le serveur à l'aide du protocole HTTP. À l'avenir, nous pourrons également utiliser facilement cette API lors de la mise à l'échelle du projet.
 
-        //Your own resources. 
-        resources.add(PersonResource.class);
-....
-		return resources;
-	}
-}
-```
-
-Next start your server, you must have your api description available at [http://localhost:8080/openapi.json](http://localhost:8080/openapi.json)
-
-### Integrate Swagger UI. 
-
-Next we have to integrate Swagger UI. We will first download it.
-https://github.com/swagger-api/swagger-ui
-
-Copy dist folder content in src/main/webapp/swagger in your project. 
-
-Edit index.html file to automatically load your openapi.json file. 
-
-At the end of the index.html, your must have something like that.
-
-```js
-   // Build a system
-      const ui = SwaggerUIBundle({
-        url: "http://localhost:8080/openapi.json",
-        dom_id: '#swagger-ui',
-        
-        ...
-```
-
-Next add a new resources to create a simple http server when your try to access to http://localhost:8080/api/.
-
-This new resources can be developped as follows
-
-```java
-package app.web.rest;
-
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.util.logging.Logger;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-
-@Path("/api")
-public class SwaggerResource {
-
-    private static final Logger logger = Logger.getLogger(SwaggerResource.class.getName());
-
-    @GET
-    public byte[] Get1() {
-        try {
-            return Files.readAllBytes(FileSystems.getDefault().getPath("src/main/webapp/swagger/index.html"));
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-    @GET
-    @Path("{path:.*}")
-    public byte[] Get(@PathParam("path") String path) {
-        try {
-            return Files.readAllBytes(FileSystems.getDefault().getPath("src/main/webapp/swagger/"+path));
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-}
-```
-
-Add this new resources in your application
-
-```java
-@ApplicationPath("/")
-public class RestApplication extends Application {
+---
 
 
-	@Override
-	public Set<Class<?>> getClasses() {
-		final Set<Class<?>> resources = new HashSet<>();
 
-
-		// SWAGGER endpoints
-		resources.add(OpenApiResource.class);
-		resources.add(PersonResource.class);
-        //NEW LINE TO ADD
-		resources.add(SwaggerResource.class);
-
-		return resources;
-	}
-}
-```
-
-Restart your server and access to http://localhost:8080/api/, you should access to a swagger ui instance that provides documentation on your api. 
-
-You can follow this guide to show how you can specialise the documentation through annotations.
-
-https://github.com/swagger-api/swagger-samples/blob/2.0/java/java-resteasy-appclasses/src/main/java/io/swagger/sample/resource/PetResource.java
