@@ -1,0 +1,4 @@
+---
+url: "/openapi.json"
+dom_id: "#swagger-ui"
+validatorUrl: "https://validator.swagger.io/validator"
